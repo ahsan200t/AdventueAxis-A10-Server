@@ -26,7 +26,8 @@ async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
-    const spotCollection= client.db('spotDB').collection('spot')
+    const spotCollection= client.db('spotDB').collection('spot');
+    const countryCollection=client.db('spotDB').collection('country')
      
      app.get('/spots', async(req,res)=>{
         const cursor=spotCollection.find();
