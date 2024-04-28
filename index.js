@@ -61,6 +61,13 @@ async function run() {
         res.send(result);
     });
 
+    app.delete('/spots/:id', async(req,res)=>{
+      const id=req.params.id;
+      const query ={_id: new ObjectId(id)}
+      const result=await spotCollection.deleteOne(query);
+      res.send(result);
+    })
+
     app.post('/country', async(req,res)=>{
       const country=req.body;
       const result=await countryCollection.insertOne(country);
