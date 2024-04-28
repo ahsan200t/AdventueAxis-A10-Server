@@ -48,6 +48,12 @@ async function run() {
         console.log(newSpot)
         const result =await spotCollection.insertOne(newSpot);
         res.send(result);
+    });
+
+    app.post('/country', async(req,res)=>{
+      const country=req.body;
+      const result=await countryCollection.insertOne(country);
+      res.send(result)
     })
 
 
