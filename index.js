@@ -2,8 +2,8 @@ const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
-const app= express();
-const port =process.env.PORT || 5000;
+const app = express();
+const port = process.env.PORT || 5000;
 
 // middlewarw
 app.use(cors());
@@ -26,51 +26,82 @@ async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
-    const spotCollection= client.db('spotDB').collection('spot');
-    const countryCollection=client.db('spotDB').collection('country')
-     
-     app.get('/spots', async(req,res)=>{
-        const cursor=spotCollection.find();
-        const result=await cursor.toArray();
-        res.send(result)
-     })
-     app.get('/country', async(req,res)=>{
-        const cursor=countryCollection.find();
-        const result=await cursor.toArray();
-        res.send(result)
-     })
+    const spotCollection = client.db('spotDB').collection('spot');
+    const countryCollection = client.db('spotDB').collection('country')
 
-     app.get('/myList/:email', async(req,res)=>{
-      const result=await spotCollection.find({email: req.params.email}).toArray();
+    app.get('/spots', async (req, res) => {
+      const cursor = spotCollection.find();
+      const result = await cursor.toArray();
+      res.send(result)
+    })
+    app.get('/country', async (req, res) => {
+      const cursor = countryCollection.find();
+      const result = await cursor.toArray();
+      res.send(result)
+    })
+
+    app.get('/myList/:email', async (req, res) => {
+      const result = await spotCollection.find({ email: req.params.email }).toArray();
       res.send(result)
 
-     })
+    })
 
-     app.get('/spots/:id', async(req,res)=>{
-      const id=req.params.id;
-      const query={_id: new ObjectId(id)};
-      const result =await spotCollection.findOne(query);
+    app.get('/spots/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await spotCollection.findOne(query);
       res.send(result)
-     })
+    })
+
+    app.get('/spots/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) }
+      const result = await spotCollection.findOne(query);
+      res.send(result)
+    })
 
 
-    app.post('/spots', async(req,res)=>{
-        const newSpot=req.body;
-        console.log(newSpot)
-        const result =await spotCollection.insertOne(newSpot);
-        res.send(result);
+    app.post('/spots', async (req, res) => {
+      const newSpot = req.body;
+      console.log(newSpot)
+      const result = await spotCollection.insertOne(newSpot);
+      res.send(result);
     });
 
-    app.delete('/spots/:id', async(req,res)=>{
-      const id=req.params.id;
-      const query ={_id: new ObjectId(id)}
-      const result=await spotCollection.deleteOne(query);
+    app.put("/spots/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) };
+      const options = { upsert: true };
+      const updatedSpot=req.body;
+      const spot={
+        $set:{
+          name: updatedSpot.name,
+          country: updatedSpot.country,
+          location: updatedSpot.location,
+          description: updatedSpot.description,
+          cost: updatedSpot.cost,
+          season: updatedSpot.season,
+          time: updatedSpot.time,
+          visitors: updatedSpot.visitors,
+          email: updatedSpot.email,
+          user: updatedSpot.user,
+          photo: updatedSpot.photo,
+        }
+      }
+      const result=await spotCollection.updateOne(filter,spot,options);
       res.send(result);
     })
 
-    app.post('/country', async(req,res)=>{
-      const country=req.body;
-      const result=await countryCollection.insertOne(country);
+    app.delete('/spots/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) }
+      const result = await spotCollection.deleteOne(query);
+      res.send(result);
+    })
+
+    app.post('/country', async (req, res) => {
+      const country = req.body;
+      const result = await countryCollection.insertOne(country);
       res.send(result)
     })
 
@@ -87,10 +118,10 @@ async function run() {
 run().catch(console.dir);
 
 
-app.get('/', (req,res)=>{
-    res.send('connected')
+app.get('/', (req, res) => {
+  res.send('connected')
 })
 
-app.listen(port, ()=>{
-    console.log(`Connected on port: ${port}`)
+app.listen(port, () => {
+  console.log(`Connected on port: ${port}`)
 })
